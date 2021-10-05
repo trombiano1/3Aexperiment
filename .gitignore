@@ -12,7 +12,7 @@
 /**/*.log
 /**/*.out
 /**/*.mp4
+/**/.model
 /**/.DS_Store
 /**/.texpadtmp/
 /**/.vscode/
-/**/.model

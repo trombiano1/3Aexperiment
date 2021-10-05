@@ -4,12 +4,12 @@ import torch
 import sentence_data
 from translator_model import TranslatorModel
 
-dataset = sentence_data.SentenceData("dataset/data_1000.txt")
+dataset = sentence_data.SentenceData("dataset/data_full.txt")
 
 model = TranslatorModel(dataset.english_word_size(),
                         dataset.japanese_word_size())
 
-model.load_state_dict(torch.load("trained_model/translator_10.model"))
+model.load_state_dict(torch.load("trained_model/translator_full.model"))
 
 # 入力された文章を単語に分割する
 sentence = input("input an english sentence : ").split(' ')

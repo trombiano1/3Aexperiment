@@ -2,7 +2,6 @@
 # EOSの単語IDを0と定義する
 EOS_ID = 0
 
-
 class SentenceData:
     def __init__(self, file_name):
         with open(file_name, "r") as f:

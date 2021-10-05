@@ -8,7 +8,7 @@ from language_model_lstm import LanguageModelLSTM
 
 dataset = sentence_data.SentenceData("dataset/data_1000.txt")
 
-model = LanguageModelLSTM(dataset.japanese_word_size())
+model = LanguageModelLSTM(dataset.english_word_size())
 
 model.load_state_dict(torch.load("trained_model/langage_model_lstm_10.model"))
 model.reset_state()
@@ -22,7 +22,7 @@ for word in initial_words:
         # 単語が空だったら飛ばす
         continue
     print(word)
-    word_id = dataset.japanese_word_id(word)
+    word_id = dataset.english_word_id(word)
     if word_id is None:
         sys.stderr.write("Error : Unknown word " + word + "\n")
         sys.exit()
@@ -41,5 +41,5 @@ for i in range(30):
     # EOSが出力されたら終了
     if word_id == EOS_ID:
         sys.exit()
-    print(dataset.japanese_word(word_id))
+    print(dataset.english_word(word_id))
     next_y = model(word_id)

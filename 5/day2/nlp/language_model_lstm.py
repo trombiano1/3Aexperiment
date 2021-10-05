@@ -36,4 +36,3 @@ class LanguageModelLSTM(nn.Module):
         self.hr = self.W_lstm(hi, self.hr)
         y = self.W_hr_y(self.hr[0])
         return y
-        

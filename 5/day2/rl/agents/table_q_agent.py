@@ -54,7 +54,7 @@ class TableQAgent(abstract_agent.Agent):
         return []
 
     def train(self, obs, reward):
-        #print(self.q_table_to_str())
+        #print(self.q_table_to_str()) # Prints beautified Q-table
         if self.last_obs is not None:
             assert(self.last_action is not None)
             last_obs_key, obs_key = [self.observation_to_key(o) for o in [self.last_obs, obs]]

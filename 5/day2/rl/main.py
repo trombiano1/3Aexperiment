@@ -7,7 +7,7 @@ from print_buffer import PrintBuffer
 # 環境と agent を用意
 env = gym.make('EasyMaze-v0') #env作成
 # env = gym.make('CartPole-v0')
-agent = agents.RandomAgent(env) #agent作成
+agent = agents.TableQAgent(env) #agent作成
 # agent = agents.RulebaseAgent(env)
 # agent = agents.TableQAgent(env)
 # agent = agents.DQNAgent(env)
@@ -15,7 +15,7 @@ agent = agents.RandomAgent(env) #agent作成
 
 # 描画設定
 # train時・test時に各 step を描画するかどうか
-prints_detail = {'train': True, 'test': True}
+prints_detail = {'train': False, 'test': False}
 # 何 episode ごとに統計情報を出力するか
 every_print_statistics = {'train': 10, 'test': 10}
 # 描画モード
@@ -33,6 +33,8 @@ n_max_time = {'train': 300, 'test': 300}
 # ゲームを繰り返す
 for interact_mode in ['train', 'test']:  # 一周目: train, 二周目: test
     sum_of_all_rewards = 0.0  # episode ごとの average reward を出すために、総計を覚えておく
+    sum_of_all_steps = 0.0  # episode ごとの average steps を出すために、総計を覚えておく
+
     for i_episode in range(n_episode[interact_mode]):  # 各episode について
         render_buffer.prints('-------------------------------')
         render_buffer.prints('episode: {0} / {1}'.format(i_episode, n_episode[interact_mode]))
@@ -41,6 +43,7 @@ for interact_mode in ['train', 'test']:  # 一周目: train, 二周目: test
         obs = env.reset()
         for time in range(n_max_time[interact_mode]):  # 各 step について
             if prints_detail[interact_mode]:
+                agent.q_table_to_str(agent.q_table_to_str)
                 # 環境を描画
                 if render_mode == 'human':
                     env.render(render_mode)
@@ -77,9 +80,11 @@ for interact_mode in ['train', 'test']:  # 一周目: train, 二周目: test
         else:
             agent.stop_episode()
         sum_of_all_rewards += sum_of_rewards
+        sum_of_all_steps += time
         # 数 episodes に一回、統計情報を表示
         if (i_episode + 1) % every_print_statistics[interact_mode] == 0 or prints_detail[interact_mode]:
             average_rewards = sum_of_all_rewards / (i_episode + 1)
-            print(interact_mode, 'episode:', i_episode + 1, 'T:', '???',
+            average_steps = sum_of_all_steps / (i_episode + 1)
+            print(interact_mode, 'episode:', i_episode + 1, 'T:', average_steps,
                   'R:', average_rewards, 'statistics:', agent.get_statistics())
     print(interact_mode, 'finished.')

@@ -34,7 +34,7 @@ class TableQAgent(abstract_agent.Agent):
         return self.select_action(obs)
 
     def act(self, obs):
-        return self.select_action(obs)
+        return np.argmax(self.q_table[(obs['x'],obs['y'])])
 
     def stop_episode_and_train(self, obs, reward, done=False):
         self.train(obs, reward)
@@ -54,6 +54,7 @@ class TableQAgent(abstract_agent.Agent):
         return []
 
     def train(self, obs, reward):
+        #print(self.q_table_to_str())
         if self.last_obs is not None:
             assert(self.last_action is not None)
             last_obs_key, obs_key = [self.observation_to_key(o) for o in [self.last_obs, obs]]
@@ -71,7 +72,8 @@ class TableQAgent(abstract_agent.Agent):
                 #       self.q_table の実装がどのようになっているかに注意してください。
                 # ------------
                 # max_q = # here #
-                raise NotImplementedError()
+                # obsが今回、last_obsが前回
+                max_q = np.max(self.q_table[obs_key])
                 # ------------
             else:
                 max_q = 0.0
@@ -82,9 +84,14 @@ class TableQAgent(abstract_agent.Agent):
             # なお、データ (s, a, r, s') が与えられたとき、Q学習の更新式は
             # Q(s, a) = (1 - p) * Q(s, a) + p * ( r + g * max_{a'} {Q(s', a') } )
             # です。ここで、pは学習率、gは割引率です。
+            # 学習率
+            #self.learning_rate = 0.1
+            # 割引率
+            #self.discount_factor = 0.95
+            # epsilon (ランダムに動く確率)
+            #self.exploration_prob = 0.3
             # ------------
-            # self.q_table[# here #][# here #] = # here #
-            raise NotImplementedError()
+            self.q_table[last_obs_key][self.last_action] = (1 - self.learning_rate) * self.q_table[last_obs_key][self.last_action] + self.learning_rate * ( reward + self.discount_factor * max_q)
             # ------------
 
         # 観測を保存
@@ -112,8 +119,7 @@ class TableQAgent(abstract_agent.Agent):
         # random_action に 0, 1, ..., (self.action_num - 1)のうちランダムな番号が入るようにしてください。
         # Hint: random_agent.py を参考にしてみましょう。
         # ------------
-        # random_action = # here #
-        raise NotImplementedError()
+        random_action = np.random.randint(self.action_num)
         # ------------
 
         # exploitation (活用)
@@ -121,8 +127,7 @@ class TableQAgent(abstract_agent.Agent):
         # max_q_action に 0, 1, ..., (self.action_num - 1)のうちQ値の最も大きい番号が入るようにしてください。
         # Hint: np.argmax() を使うとよいでしょう。
         # ------------
-        # max_q_action = # here #
-        raise NotImplementedError()
+        max_q_action = np.argmax(self.q_table[obs_key])
         # ------------
 
         # どっちか選択
@@ -130,8 +135,7 @@ class TableQAgent(abstract_agent.Agent):
         # action に確率 e で random_action が、確率 1-e でmax_q_action が入るようにしてください。
         # Hint: np.random.choice() を使うとよいでしょう。
         # ------------
-        # action = # here #
-        raise NotImplementedError()
+        action = np.random.choice([random_action,max_q_action],p=[self.exploration_prob,1-self.exploration_prob])
         # ------------
 
         return action

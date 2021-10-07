@@ -13,6 +13,7 @@
 /**/*.out
 /**/*.mp4
 /**/*.model
+/**/*.pyc
 /**/.DS_Store
 /**/.texpadtmp/
 /**/.vscode/

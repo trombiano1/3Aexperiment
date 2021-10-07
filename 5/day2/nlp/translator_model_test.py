@@ -4,12 +4,12 @@ import torch
 import sentence_data
 from translator_model import TranslatorModel
 
-dataset = sentence_data.SentenceData("dataset/data_full.txt")
+dataset = sentence_data.SentenceData("dataset/data_1000.txt")
 
 model = TranslatorModel(dataset.english_word_size(),
                         dataset.japanese_word_size())
 
-model.load_state_dict(torch.load("trained_model/translator_full.model"))
+model.load_state_dict(torch.load("trained_model/translator_10.model"))
 
 # 入力された文章を単語に分割する
 sentence = input("input an english sentence : ").split(' ')
@@ -22,11 +22,10 @@ for word in sentence:
     word = word.lower()
     id = dataset.english_word_id(word)
     if id is None:
-        sys.stderr.write("Error : Unknown word " + word + "\n")
-        sys.exit()
-    else:
-        id = torch.tensor(id,dtype=torch.long).unsqueeze(-1)
-        sentence_id.append(id)
+        word = "<UNKNOWN>"
+        id = dataset.english_word_id(word)
+    id = torch.tensor(id,dtype=torch.long).unsqueeze(-1)
+    sentence_id.append(id)
 
 japanese = model(torch.stack(sentence_id))
 for id in japanese:

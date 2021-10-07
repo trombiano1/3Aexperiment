@@ -3,22 +3,22 @@
 ## 演習 1.1.2
 
 作成している行
-agent:
-env:
+agent: 8
+env: 10
 
 呼び出されている変数・メソッド
 
 agent:
-*
-*
-*
-*
-*
+*act_and_train
+*act
+*get_statistics
+*stop_episode_and_train
+*stop_episode
 
 env:
-*
-*
-*
+*reset
+*render
+*step
 
 ## 演習 1.1.3
 

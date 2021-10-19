@@ -1,6 +1,6 @@
 import speech_recognition as sr
 
-AUDIO_FILE = "./longersample.wav"
+AUDIO_FILE = "./sample4.wav"
 
 # use the audio file as the audio source
 r = sr.Recognizer()

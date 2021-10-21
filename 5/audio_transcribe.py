@@ -1,6 +1,6 @@
 import speech_recognition as sr
 
-AUDIO_FILE = "./sample4.wav"
+AUDIO_FILE = "./audio_samples/kishida/sample1.wav"
 
 # use the audio file as the audio source
 r = sr.Recognizer()

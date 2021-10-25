@@ -15,24 +15,32 @@ from keybert import KeyBERT #keyBERT
 # で出る
 #
 # -i 入力音声/動画の相対path(必須, 動画mp4でしか試してない)
-# -m 5 とすると最大で170s * 5 秒分の音声を処理する(空欄なら10) 
-#    放っとくと1時間分とかやり出しそうなので上限を設定
+# -s 開始時間と終了時間(秒)を指定できる(デフォルトは全部)
 # -t をつけると音声認識の文章を保存する
+#
+# ex) $ python3 project.py -i kishida.mp4 -t -s 150 350
+#       -> kishida.mp4を150秒~350秒で処理, 文章も保存
 #============================================
 
 # ffmpegで音声をカット----------------------------
-def split_audio(path, themax=10):
+def split_audio(path, time_section):
     print("Splitting audio....")
     directorypath = os.path.join(pathlib.Path(path).parent.resolve(),'project_data')
     os.mkdir(directorypath)
     audio_input = ffmpeg.input(path)
     info=ffmpeg.probe(path)
-    duration = int(float(info['format']['duration']))
+    original_duration = int(float(info['format']['duration']))
+    if time_section == [-1,-1]:
+        time_section = [0, original_duration]
+    duration = time_section[1] - time_section[0]
     print("Duration: "+str(duration)+"s")
     paths = []
-    for i in range (0,min(int(duration/170.0)+1,themax)):
-        print("Saving audio",i+1,"of",min(int(duration/170.0)+1,themax),"...")
-        audio_cut = audio_input.audio.filter('atrim', duration=170, start = i * 170)
+    for i in range (0,int(duration/170.0)+1):
+        print("Saving audio",i+1,"of",int(duration/170.0)+1,"...")
+        if i == int(duration/170.0):
+            audio_cut = audio_input.audio.filter('atrim', duration=duration%170, start = i * 170 + time_section[0])
+        else:
+            audio_cut = audio_input.audio.filter('atrim', duration=170, start = i * 170 + time_section[0])
         audio_output = ffmpeg.output(audio_cut, os.path.join(directorypath,('sample'+str(i)+'.wav')),loglevel="quiet")
         paths.append(directorypath+'/sample'+str(i)+'.wav')
         ffmpeg.run(audio_output)
@@ -117,14 +125,22 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i', metavar='INPUT_FILE_PATH',action='store', type=pathlib.Path, dest='input_path', help='input file path',required=True)
 parser.add_argument('-t', action='store_true', dest='save_transcript')
 #parser.add_argument('-t', metavar='SAVE_TRANSCRIPT', action='store_true', dest='save_transcript', help='save transcript as a txt file')
-parser.add_argument('-m', metavar='NUMBER_OF_SOUNDBITES', action='store', dest='n_soundbites', type=int, default=5, help='maximum number of soundbites')
+#parser.add_argument('-m', metavar='NUMBER_OF_SOUNDBITES', action='store', dest='n_soundbites', type=int, default=5, help='maximum number of soundbites')
+parser.add_argument('-s', metavar=['START_SECOND','END_SECOND'], action='store', type=int, nargs=2, dest='time_section')
 
 args = parser.parse_args()
 input_path = args.input_path
-n_soundbites = int(args.n_soundbites)
+#n_soundbites = int(args.n_soundbites)
 save_transcript = args.save_transcript
+if args.time_section == None:
+    time_section = [-1,-1]
+else:
+    time_section = args.time_section
 
-paths = split_audio(input_path,n_soundbites)
+if time_section[0] > time_section[1]:
+    exit(1)
+
+paths = split_audio(input_path, time_section)
 speech_recognition_text = audios_to_txt(paths)
 if save_transcript:
     f = open(os.path.join(pathlib.Path(input_path).parent.resolve(),"project_data","TRANSCRIPT.txt"), "x")

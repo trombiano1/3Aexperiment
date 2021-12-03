@@ -1,0 +1,12 @@
+opencv-python
+pytest-shutil
+pathlib
+argparse
+ffmpeg-python
+SpeechRecognition
+pyaudio
+google-api-python-client
+mecab-python3
+unidic-lite
+keybert
+python-pptx
